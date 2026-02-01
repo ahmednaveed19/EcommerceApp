@@ -1,4 +1,5 @@
 using API.Data;
+using API.Middleware;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,7 @@ builder.Services.AddDbContext<StoreContext>(opt =>
 });
 
 builder.Services.AddCors();
+builder.Services.AddTransient<ExceptionMiddleware>();
 
 var app = builder.Build();
 
@@ -24,6 +26,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseMiddleware<ExceptionMiddleware>();
+
 app.UseCors(opt =>
 {
     opt.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
