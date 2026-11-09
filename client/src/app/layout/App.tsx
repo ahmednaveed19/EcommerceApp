@@ -1,10 +1,10 @@
 import { Box, Container, createTheme, CssBaseline, ThemeProvider } from "@mui/material";
-import NavBar from "../layout/NavBar";
-import { Outlet } from "react-router-dom";
+import NavBar from "./NavBar";
+import { Outlet, ScrollRestoration } from "react-router-dom";
 import { useAppSelector } from "../store/store";
 
-function App() {
 
+function App() {
   const {darkMode} = useAppSelector(state => state.ui);
   const palleteType = darkMode ? 'dark' : 'light'
   const theme = createTheme({
@@ -16,11 +16,9 @@ function App() {
     }
   });
 
-
-
-
   return (
     <ThemeProvider theme={theme}>
+      <ScrollRestoration />
       <CssBaseline />
       <NavBar />
       <Box
@@ -33,10 +31,13 @@ function App() {
         }}
       >
         <Container maxWidth='xl' sx={{ mt: 8 }}>
-        <Outlet />
+          <Outlet />
         </Container>
       </Box>
+
     </ThemeProvider>
+
   )
 }
+
 export default App
