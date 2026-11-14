@@ -17,7 +17,7 @@ export default function CheckoutStepper() {
     const [activeStep, setActiveStep] = useState(0);
     const [createOrder] = useCreateOrderMutation();
     const {basket} = useBasket();
-    const {data: savedAddress, isLoading} = useFetchAddressQuery();
+    const {data, isLoading} = useFetchAddressQuery();
     const [updateAddress] = useUpdateUserAddressMutation();
     const [saveAddressChecked, setSaveAddressChecked] = useState(false);
     const elements = useElements();
@@ -28,6 +28,11 @@ export default function CheckoutStepper() {
     const {total, clearBasket} = useBasket();
     const navigate = useNavigate();
     const [confirmationToken, setConfirmationToken] = useState<ConfirmationToken | null>(null);
+
+    let name, restAddress;
+    if (data) {
+        ({name, ...restAddress} = data);
+    }
 
     const handleNext = async () => {
         if (activeStep === 0 && saveAddressChecked && elements) {
@@ -134,19 +139,10 @@ export default function CheckoutStepper() {
                     <AddressElement 
                         options={{
                             mode: 'shipping',
-                            ...(savedAddress && {
-                                defaultValues: {
-                                    name: savedAddress.name,
-                                    address: {
-                                        line1: savedAddress.line1,
-                                        line2: savedAddress.line2,
-                                        city: savedAddress.city,
-                                        state: savedAddress.state,
-                                        postal_code: savedAddress.postal_code,
-                                        country: savedAddress.country
-                                    }
-                                }
-                            })
+                            defaultValues: {
+                                name: name,
+                                address: restAddress
+                            }
                         }}
                         onChange={handleAddressChange}
                     />
@@ -160,7 +156,15 @@ export default function CheckoutStepper() {
                     />
                 </Box>
                 <Box sx={{display: activeStep === 1 ? 'block' : 'none'}}>
-                    <PaymentElement onChange={handlePaymentChange} />
+                    <PaymentElement 
+                        onChange={handlePaymentChange} 
+                        options={{
+                            wallets: {
+                                applePay: 'never',
+                                googlePay: 'never'
+                            }
+                        }}
+                    />
                 </Box>
                 <Box sx={{display: activeStep === 2 ? 'block' : 'none'}}>
                     <Review confirmationToken={confirmationToken} />
